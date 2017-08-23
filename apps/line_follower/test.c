@@ -239,7 +239,7 @@ int main()
         // to the right.  If it is a negative number, the robot will
         // turn to the left, and the magnitude of the number determines
         // the sharpness of the turn.
-        int power_difference = (current_error / 20) + (integral / 10000) + ((derivative * 3) / 2);
+        int power_difference = (current_error / 2) + (integral / 10000) + ((derivative * 3) / 2);
 
         // Compute the actual motor settings.  We never set either motor
         // to a negative value.

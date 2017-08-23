@@ -243,10 +243,10 @@ int main()
 
         // Compute the actual motor settings.  We never set either motor
         // to a negative value.
-        const int max = 60;
+        const int max = 90;
         if(power_difference > max)
             power_difference = max;
-        if(power_difference < -max)
+        else if(power_difference < -max)
             power_difference = -max;
 
         if(power_difference < 0)

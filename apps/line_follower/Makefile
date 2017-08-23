@@ -12,7 +12,7 @@ OBJ2HEX=avr-objcopy
 LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax
 
 AVRDUDE=avrdude
-TARGET=test
+TARGET=main
 
 all: $(TARGET).hex
 

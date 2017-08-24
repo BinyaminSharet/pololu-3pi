@@ -11,7 +11,7 @@
 // pieces of static data should be stored in program space.
 #include <avr/pgmspace.h>
 
-const char app_banner1[] PROGMEM = "~Basics~";
+const char app_banner1[] PROGMEM = " Basics ";
 const char app_banner2[] PROGMEM = "Movement";
 
 void welcome_proc()
@@ -20,7 +20,7 @@ void welcome_proc()
     print_from_program_space(app_banner1);
     lcd_goto_xy(0,1);
     print_from_program_space(app_banner2);
-    delay_ms(2000);
+    delay_ms(4000);
 }
 
 void display_battery() {
@@ -61,73 +61,77 @@ void initialize()
 
 }
 
-static const char m1_banner[] PROGMEM = "   M1   ";
-static const char m2_banner[] PROGMEM = "   M2   ";
-static const char delay_banner[] PROGMEM = " DELAY  ";
-
 static void get_int(int minval, int maxval, int step, int * p_val) {
     int val = (maxval + minval) / 2;
     if (*p_val >= minval && *p_val <= maxval) {
         val = *p_val;
     }
-    lcd_goto_xy(0,1);
-    print_character('-');
-    lcd_goto_xy(7,1);
-    print_character('+');
-    while(!button_is_pressed(BUTTON_B)) {
-        lcd_goto_xy(2,1);
+    lcd_goto_xy(0, 1);
+    print_character('v');
+    lcd_goto_xy(7, 1);
+    print_character('^');
+    while(1) {
+        lcd_goto_xy(1, 1);
+        print("      ");
+        lcd_goto_xy(2, 1);
         print_long(val);
-        if (button_is_pressed(BUTTON_A)) {
-            wait_for_button_release(BUTTON_A);
+
+        unsigned char button = 0;
+        while(!(button = get_single_debounced_button_press(ANY_BUTTON)))
+            ;
+        while(!get_single_debounced_button_release(button))
+            ;
+        if (button == BUTTON_A) {
             if (minval + step <= val) {
                 val -= step;
             }
         }
-        if (button_is_pressed(BUTTON_C)) {
-            wait_for_button_release(BUTTON_C);
+        else if (button == BUTTON_C) {
             if (maxval - step >= val) {
                 val += step;
             }
         }
+        else if (button == BUTTON_B) {
+            break;
+        }
     }
-    wait_for_button_release(BUTTON_B);
     *p_val = val;
 }
 
 static void get_m1(int * p_m1) {
     clear();
-    print_from_program_space(m1_banner);
+    print("   M1   ");
     get_int(-100, 100, 2, p_m1);
 }
 
 static void get_m2(int * p_m2) {
     clear();
-    print_from_program_space(m2_banner);
+    print("   M2   ");
     get_int(-100, 100, 2, p_m2);
 }
 
 static void get_delay(int *p_delay) {
     clear();
-    print_from_program_space(delay_banner);
-    get_int(1000, 3000, 2, p_delay);
+    print(" DELAY  ");
+    get_int(100, 3000, 1, p_delay);
 }
 
 int main()
 {
-    int a_m1 = 60;
-    int a_m2 = -60;
-    int a_delay = 1070;
+    int a_m1 = 100;
+    int a_m2 = -100;
+    int a_delay = 314;
 
     // set up the 3pi
     initialize();
-
-    wait_for_button(BUTTON_B);
 
     while(1) {
         get_m1(&a_m1);
         get_m2(&a_m2);
         get_delay(&a_delay);
 
+        clear();
+        print(">> B <<");
         wait_for_button(BUTTON_B);
 
         set_motors(a_m1, a_m2);
